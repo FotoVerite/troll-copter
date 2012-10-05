@@ -14,7 +14,7 @@ $(document).ready(function(){
 	  socket.on('isFlying', function (data) {
 	  	window.location.href='#isFlying';
 	  	window.location.href="#"
-	  }
+	  });
 
 });
 
