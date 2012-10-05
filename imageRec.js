@@ -2,8 +2,8 @@
  * dron png strem to
  */
 
-var arDrone = require('../node-ar-drone');
-var cv = require('../node-opencv/lib/opencv');
+var arDrone = require('./node-ar-drone');
+var cv = require('opencv');
 var fs = require('fs');
 
 var client = arDrone.createClient();
@@ -18,6 +18,30 @@ var i = 0;
 
 var dirPath = './tmp/'+Date.now();
 fs.mkdir(dirPath, 0777);
+
+var Twitter = require('node-twitter');
+
+var twitterRestClient = new Twitter.RestClient(
+    'DJvUNNjk6WsSqr8B9OH5Bw',
+    'sk8C3AkAalt86zRgCbLJGhwnLpkbSGUZekUiVtwmUaw',
+    '15252015-cuZ2LOfRxR4MosggW12gcrVwQ1pfFExyk4lbnwDBW',
+    '402cOCf6pNuEZk01fw9c7NjUgxwFE0U7eLM23hxwqY'
+);
+
+var sendMedia = function(media) {
+    console.log(media);
+
+    // twitterRestClient.statusesUpdateWithMedia(
+    //     {
+    //         'status': 'Posting a face. #NODECOPTER',
+    //         'media[]': media
+    //     },
+    //     function(data) {
+    //     console.log(data);
+    //     }
+    // );
+
+}
 
 console.log('pngStram capture started');
 
@@ -34,6 +58,7 @@ function addObjectsToImage(obejcts, image, frameType, color){
             }
         }
         image.save(dirPath + '/cam_' + (i++) + '.png');
+        sendMedia(dirPath + '/cam_' + (i++) + '.png');
     }
 }
 
