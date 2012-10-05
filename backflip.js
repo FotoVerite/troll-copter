@@ -1,20 +1,62 @@
 //Modules whoop whoop
 var arDrone = require('ar-drone');
 var droneClient  = arDrone.createClient();
+var express = require('express');
+var exec = require('child_process').exec;
+var app = module.exports = express.createServer();
 
-droneClient.takeoff();
+var io = require('socket.io').listen(app);
 
-droneClient.after(5000, function() {
-	console.log("going up");
-	this.up(1);
-  })
-  .after(5000, function() {
-  	console.log("Do a backflip");
-  	//if power is < 30%, it won't flip
-  	this.animate('flipBehind', 15);
-	})
-  .after(3000, function() {
-	console.log("going down");
-	this.stop();
-	this.land();
+  // Configuration
+  app.configure(function(){
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'jade');
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(app.router);
+    app.use(express.static(__dirname + '/public'));
   });
+  
+app.configure('development', function(){
+   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+ });
+ 
+ app.configure('production', function(){
+   app.use(express.errorHandler());
+ });
+ 
+ app.get('/', function(req, res){
+   res.render('index', { title: 'TrollCopter', host : req.query.host });
+ });
+ 
+ app.listen(3000, function(){
+   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+ 
+ });
+ 
+ io.sockets.on('connection', function (socket) {
+ 	
+  socket.emit("connected");
+ 
+   socket.on('makeFlight', function () {
+	console.log("flying");
+ 	droneClient.takeoff();
+ 	
+ 	droneClient.after(5000, function() {
+ 		console.log("going up");
+ 		this.up(1);
+ 	  })
+ 	  .after(5000, function() {
+ 	  	console.log("Do a backflip");
+ 	  	//if power is < 30%, it won't flip
+ 	  	this.animate('flipBehind', 15);
+ 		})
+ 	  .after(3000, function() {
+ 		console.log("going down");
+ 		this.stop();
+ 		this.land();
+ 	  });
+ 	
+   });
+ 
+ });

@@ -3,6 +3,9 @@
   , "version": "0.0.1"
   , "private": true
   , "dependencies": {
-	 "ar-drone": ">= 0"
+	  "express": "2.5.8"
+	  , "jade": ">= 0.0.1"
+	  , "socket.io": ">= 0"
+	  , "ar-drone": ">= 0"
   }
 }
