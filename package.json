@@ -1,0 +1,8 @@
+{
+	"name": "Troll-Copter"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+	 "ar-drone": ">= 0"
+  }
+}
