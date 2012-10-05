@@ -48,4 +48,9 @@ app.configure('development', function(){
 	   droneClient.animate('flipBehind', 15);
 	   socket.emit("doneFlip");
 	 });
+	 
+	 socket.on('turn180', function () {
+	    console.log("turning 180");
+	    droneClient.animate('turnaround', 30);
+	  });
  });

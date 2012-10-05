@@ -20,3 +20,7 @@ function makeFlight(){
 function doFlip(){
 	socket.emit('doFlip');
 }
+
+function turn180(){
+	socket.emit('turn180');
+}
