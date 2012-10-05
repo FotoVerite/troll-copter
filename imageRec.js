@@ -73,9 +73,9 @@ function parseIm(buffer) {
                     im.detectObject('../node-opencv/data/haarcascade_frontalface_alt_tree.xml', {}, function(err, faces) {
                         addObjectsToImage(faces, im, 'rectangle', GREEN);
                     });
-                    im.detectObject('../node-opencv/data/haarcascade_fullbody.xml', {}, function(err, faces) {
-                        addObjectsToImage(faces, im, 'rectangle', GREEN);
-                    });
+//                    im.detectObject('../node-opencv/data/haarcascade_fullbody.xml', {}, function(err, faces) {
+//                        addObjectsToImage(faces, im, 'elipsis', RED);
+//                    });
                 } else {
                     console.log(err);
                 }
