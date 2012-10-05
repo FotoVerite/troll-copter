@@ -5,9 +5,18 @@ $(document).ready(function(){
 	   	window.location.href='#connected';
 	   	window.location.href='#';
 	  });
+	  
+	  socket.on('doneFlip', function (data) {
+	    	window.location.href='#doneflip';
+	    	window.location.href='#';
+	   });
 
 });
 
 function makeFlight(){
 	socket.emit('makeFlight');
+}
+
+function doFlip(){
+	socket.emit('doFlip');
 }

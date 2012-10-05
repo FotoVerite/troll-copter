@@ -39,24 +39,13 @@ app.configure('development', function(){
   socket.emit("connected");
  
    socket.on('makeFlight', function () {
-	console.log("flying");
- 	droneClient.takeoff();
- 	
- 	droneClient.after(5000, function() {
- 		console.log("going up");
- 		this.up(1);
- 	  })
- 	  .after(5000, function() {
- 	  	console.log("Do a backflip");
- 	  	//if power is < 30%, it won't flip
- 	  	this.animate('flipBehind', 15);
- 		})
- 	  .after(3000, function() {
- 		console.log("going down");
- 		this.stop();
- 		this.land();
- 	  });
- 	
+		console.log("flying");
+ 		droneClient.takeoff(); 	
    });
- 
+   
+   socket.on('doFlip', function () {
+	   console.log("doing backflip");
+	   droneClient.animate('flipBehind', 15);
+	   socket.emit("doneFlip");
+	 });
  });
