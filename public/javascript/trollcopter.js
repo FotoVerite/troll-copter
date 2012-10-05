@@ -11,10 +11,18 @@ $(document).ready(function(){
 	    	window.location.href='#';
 	   });
 
+	  socket.on('isFlying', function (data) {
+	  	window.location.href='#isFlying';
+	  	window.location.href="#"
+	  });
+
 });
 
-function makeFlight(){
-	socket.emit('makeFlight');
+function takeOff(){
+	socket.emit('takeOff');
+}
+function land(){
+	socket.emit('land');
 }
 
 function doFlip(){

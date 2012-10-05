@@ -38,13 +38,20 @@ app.configure('development', function(){
  	
   socket.emit("connected");
  
-   socket.on('makeFlight', function () {
-		console.log("flying");
+   socket.on('takeOff', function () {
+		console.log("Taking off.... flying!");
  		droneClient.takeoff(); 	
+    socket.emit("isFlying");
+   });
+
+   socket.on('land', function (){
+      console.log("Landing...");
+      droneClient.land();
+      socket.emit("hasLanded");
    });
    
    socket.on('doFlip', function () {
-	   console.log("doing backflip");
+	   console.log("Doing a backflip...");
 	   droneClient.animate('flipBehind', 15);
 	   socket.emit("doneFlip");
 	 });
