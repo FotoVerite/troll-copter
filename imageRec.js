@@ -1,76 +1,97 @@
-/* 
- * dron png strem to 
+/*
+ * dron png strem to
  */
 
-var arDrone = require('../node-ar-drone');
-var cv = require('../node-opencv/lib/opencv');
+var arDrone = require('./node-ar-drone');
+var cv = require('opencv');
 var fs = require('fs');
-var Png = require('png').Png;
 
 var client = arDrone.createClient();
 client.config('videoEnabled', 1);
 var pngStream = arDrone.createPngStream();
-
+var lastPng;
 
 var GREEN = [0, 255, 0];
 var RED = [255, 0, 0];
 var BLUE = [255, 0, 0];
-
-var dirPath = './tmp/'+Date.now();
-fs.mkdir(dirPath,0777);
-
 var i = 0;
 
-console.log('start');
+var dirPath = './tmp/'+Date.now();
+fs.mkdir(dirPath, 0777);
+
+var Twitter = require('node-twitter');
+
+var twitterRestClient = new Twitter.RestClient(
+    'DJvUNNjk6WsSqr8B9OH5Bw',
+    'sk8C3AkAalt86zRgCbLJGhwnLpkbSGUZekUiVtwmUaw',
+    '15252015-cuZ2LOfRxR4MosggW12gcrVwQ1pfFExyk4lbnwDBW',
+    '402cOCf6pNuEZk01fw9c7NjUgxwFE0U7eLM23hxwqY'
+);
+
+var sendMedia = function(media) {
+    console.log(media);
+
+    // twitterRestClient.statusesUpdateWithMedia(
+    //     {
+    //         'status': 'Posting a face. #NODECOPTER',
+    //         'media[]': media
+    //     },
+    //     function(data) {
+    //     console.log(data);
+    //     }
+    // );
+
+}
+
+console.log('pngStram capture started');
 
 function addObjectsToImage(obejcts, image, frameType, color){
     var amount = obejcts.length;
-    console.log('found ' + amount);
-    for(var k = 0; k < amount; k++) {
-        var o = obejcts[k];
-        if('elipsys' === frameType){
-            image.ellipse(o.x+o.width/2, o.y+o.height/2, o.width/2, o.height/2, color);
-        } else {
-            image.rectangle([o.x, o.y], [o.x + o.width, o.y + o.height], color, 2);
+    if (0 < amount) {
+        console.log('found ' + amount + ' face(s)');
+        for(var k = 0; k < amount; k++) {
+            var o = obejcts[k];
+            if('elipsys' === frameType){
+                image.ellipse(o.x+o.width/2, o.y+o.height/2, o.width/2, o.height/2, color);
+            } else {
+                image.rectangle([o.x, o.y], [o.x + o.width, o.y + o.height], color, 2);
+            }
         }
+        image.save(dirPath + '/cam_' + (i++) + '.png');
+        sendMedia(dirPath + '/cam_' + (i++) + '.png');
     }
-    if (0 < amount) image.save(dirPath + '/cam_' + i + '.png');
 }
 
 function parseIm(buffer) {
-    
-    //var im = new Png(buffer, 640, 400, 'rgb');
-    
-    var im = buffer;
-    console.log(im);
 
-    i++;
+    var fd =  fs.openSync('./tmp/tmp.png', 'w');
 
-    im.detectObject('../node-opencv/data/haarcascade_lefteye_2splits.xml', {}, function(err, eyes) {
-        addObjectsToImage(eyes, im, 'elipsys', 255000000);
+    fs.write(fd, buffer, 0, buffer.length, 0, function(err,written){
+        try {
+            cv.readImage('./tmp/tmp.png', function(err, im) {
+                if(!err){
+                    im.detectObject('../node-opencv/data/haarcascade_frontalface_alt_tree.xml', {}, function(err, faces) {
+                        addObjectsToImage(faces, im, 'rectangle', GREEN);
+                    });
+//                    im.detectObject('../node-opencv/data/haarcascade_fullbody.xml', {}, function(err, faces) {
+//                        addObjectsToImage(faces, im, 'elipsis', RED);
+//                    });
+                } else {
+                    console.log(err);
+                }
+            });
+        } catch(err) {
+            console.log(err);
+        }
     });
-
-    im.detectObject('../node-opencv/data/haarcascade_righteye_2splits.xml', {}, function(err, eyes) {
-        addObjectsToImage(eyes, im, 'elipsys', 000255000);
-    });
-
-    im.detectObject('../node-opencv/data/haarcascade_frontalface_alt2.xml', {}, function(err, faces) {
-        addObjectsToImage(faces, im, 'rectangle', GREEN);
-    });
-
-    im.detectObject('../node-opencv/data/haarcascade_profileface.xml', {}, function(err, profiles) {
-        addObjectsToImage(profiles, im, 'rectangle', RED);
-    });
-
-    im.detectObject('../node-opencv/data/haarcascade_upperbody.xml', {}, function(err, ubodys) {
-        addObjectsToImage(ubodys, im, 'rectangle', RED);
-    });
-
 }
-    
-var lastPng;
-pngStream
-    .on('error', console.log)
-    .on('data', function(pngBuffer) {
-        parseIm(pngBuffer);
-    });
+
+try {
+    pngStream
+        .on('error', console.log)
+        .on('data', function(pngBuffer) {
+            parseIm(pngBuffer);
+        });
+} catch(err) {
+    console.log(err);
+}

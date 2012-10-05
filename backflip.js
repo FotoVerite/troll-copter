@@ -64,11 +64,6 @@ app.configure('development', function(){
 	    socket.emit("doneFlip");
 	  });
 	  
-	  socket.on('goForward', function () {
-	     console.log("going forward");
-	     droneClient.front(0.5);
-	   });
-	 
 	 socket.on('turn180', function () {
 	    console.log("turning 180");
 	    droneClient.after(10, function(){ droneClient.animate('theta30Deg', 15); }).after(1000, function() {droneClient.animate('theta30Deg', 15);});
