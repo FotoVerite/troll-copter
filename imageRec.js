@@ -5,7 +5,6 @@
 var arDrone = require('../node-ar-drone');
 var cv = require('../node-opencv/lib/opencv');
 var fs = require('fs');
-var Png = require('png').Png;
 
 var client = arDrone.createClient();
 client.config('videoEnabled', 1);
@@ -39,31 +38,34 @@ function addObjectsToImage(obejcts, image, frameType, color){
 
 function parseIm(buffer) {
     
-    //var im = new Png(buffer, 640, 400, 'rgb');
+    var fd =  fs.openSync('./tmp/tmp.png', 'w');
+
+    fs.write(fd, buffer, 0, buffer.length, 0, function(err,written){ 
+        i++;
     
-    var im = buffer;
-    console.log(im);
+        cv.readImage('./tmp/tmp.png', function(err, im) {
 
-    i++;
+            im.detectObject('../node-opencv/data/haarcascade_lefteye_2splits.xml', {}, function(err, eyes) {
+                addObjectsToImage(eyes, im, 'elipsys', 255000000);
+            });
 
-    im.detectObject('../node-opencv/data/haarcascade_lefteye_2splits.xml', {}, function(err, eyes) {
-        addObjectsToImage(eyes, im, 'elipsys', 255000000);
-    });
+            im.detectObject('../node-opencv/data/haarcascade_righteye_2splits.xml', {}, function(err, eyes) {
+                addObjectsToImage(eyes, im, 'elipsys', 000255000);
+            });
 
-    im.detectObject('../node-opencv/data/haarcascade_righteye_2splits.xml', {}, function(err, eyes) {
-        addObjectsToImage(eyes, im, 'elipsys', 000255000);
-    });
+            im.detectObject('../node-opencv/data/haarcascade_frontalface_alt2.xml', {}, function(err, faces) {
+                addObjectsToImage(faces, im, 'rectangle', GREEN);
+            });
 
-    im.detectObject('../node-opencv/data/haarcascade_frontalface_alt2.xml', {}, function(err, faces) {
-        addObjectsToImage(faces, im, 'rectangle', GREEN);
-    });
+            im.detectObject('../node-opencv/data/haarcascade_profileface.xml', {}, function(err, profiles) {
+                addObjectsToImage(profiles, im, 'rectangle', RED);
+            });
 
-    im.detectObject('../node-opencv/data/haarcascade_profileface.xml', {}, function(err, profiles) {
-        addObjectsToImage(profiles, im, 'rectangle', RED);
-    });
-
-    im.detectObject('../node-opencv/data/haarcascade_upperbody.xml', {}, function(err, ubodys) {
-        addObjectsToImage(ubodys, im, 'rectangle', RED);
+            im.detectObject('../node-opencv/data/haarcascade_upperbody.xml', {}, function(err, ubodys) {
+                addObjectsToImage(ubodys, im, 'rectangle', RED);
+            });
+        });
+    
     });
 
 }
