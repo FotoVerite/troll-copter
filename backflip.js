@@ -34,6 +34,8 @@ app.configure('development', function(){
  
  });
  
+// droneClient.on('navdata', console.log);
+ 
  io.sockets.on('connection', function (socket) {
  	
   socket.emit("connected");
@@ -56,8 +58,19 @@ app.configure('development', function(){
 	   socket.emit("doneFlip");
 	 });
 	 
+	 socket.on('doSideFlip', function () {
+	    console.log("Doing a side flip...");
+	    droneClient.animate('flipRight', 15);
+	    socket.emit("doneFlip");
+	  });
+	  
+	  socket.on('goForward', function () {
+	     console.log("going forward");
+	     droneClient.front(0.5);
+	   });
+	 
 	 socket.on('turn180', function () {
 	    console.log("turning 180");
-	    droneClient.animate('turnaround', 30);
+	    droneClient.after(10, function(){ droneClient.animate('theta30Deg', 15); }).after(1000, function() {droneClient.animate('theta30Deg', 15);});
 	  });
  });

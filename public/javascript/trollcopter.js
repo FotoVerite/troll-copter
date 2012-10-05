@@ -32,3 +32,11 @@ function doFlip(){
 function turn180(){
 	socket.emit('turn180');
 }
+
+function doSideFlip(){
+	socket.emit('doSideFlip');
+}
+
+function goForward(){
+	socket.emit('goForward');
+}
